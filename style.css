@@ -358,3 +358,208 @@ footer { background: #050311; border-top: 1px solid rgba(155,89,182,0.2); paddin
   .contact-wrapper { padding: 30px 20px; }
   .navbar-collapse { background: rgba(6,4,13,0.98); padding: 16px; border-radius: 12px; margin-top: 12px; border: 1px solid rgba(155,89,182,0.25); }
 }
+
+/* ============================================
+   SINGULARITY — SPACE ANIMATIONS (ADDON)
+============================================ */
+
+/* ── Canvas starfield layer ── */
+#spaceCanvas {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+/* ── Custom cursor glow ── */
+.cursor-glow {
+  position: fixed;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(212,160,23,0.8) 0%, rgba(155,89,182,0.4) 50%, transparent 70%);
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  transition: transform 0.05s, width 0.2s, height 0.2s, opacity 0.2s;
+  mix-blend-mode: screen;
+}
+.cursor-trail {
+  position: fixed;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(155,89,182,0.6);
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  transition: transform 0.12s ease-out;
+  mix-blend-mode: screen;
+}
+
+/* ── Scroll Reveal base states ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.reveal.reveal-left  { transform: translateX(-50px); }
+.reveal.reveal-right { transform: translateX(50px); }
+.reveal.reveal-scale { transform: scale(0.88); }
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0) translateX(0) scale(1);
+}
+
+/* stagger children */
+.reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.reveal-stagger.visible > *:nth-child(1) { opacity:1; transform:none; transition-delay: 0.05s; }
+.reveal-stagger.visible > *:nth-child(2) { opacity:1; transform:none; transition-delay: 0.18s; }
+.reveal-stagger.visible > *:nth-child(3) { opacity:1; transform:none; transition-delay: 0.31s; }
+.reveal-stagger.visible > *:nth-child(4) { opacity:1; transform:none; transition-delay: 0.44s; }
+.reveal-stagger.visible > *:nth-child(5) { opacity:1; transform:none; transition-delay: 0.57s; }
+.reveal-stagger.visible > *:nth-child(6) { opacity:1; transform:none; transition-delay: 0.70s; }
+
+/* ── Warp ripple on card click ── */
+.warp-ripple {
+  position: fixed;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(212,160,23,0.5) 0%,
+    rgba(155,89,182,0.35) 40%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 9997;
+  transform: translate(-50%, -50%) scale(0);
+  animation: warp-expand 0.8s cubic-bezier(0.2, 0.8, 0.4, 1) forwards;
+}
+@keyframes warp-expand {
+  0%   { transform: translate(-50%,-50%) scale(0);   opacity: 1; }
+  60%  { opacity: 0.7; }
+  100% { transform: translate(-50%,-50%) scale(12);  opacity: 0; }
+}
+
+/* ── Section number counter glow ── */
+.stat-number {
+  font-family: 'Cinzel', serif;
+  font-size: 2.8rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--gold-light), var(--primary-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: block;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+/* ── Shooting star ── */
+.shooting-star {
+  position: fixed;
+  width: 3px; height: 3px;
+  border-radius: 50%;
+  background: var(--gold-light);
+  pointer-events: none;
+  z-index: 0;
+  box-shadow: 0 0 6px 2px rgba(212,160,23,0.8);
+  animation: shoot linear forwards;
+}
+@keyframes shoot {
+  0%   { opacity: 1; transform: translate(0, 0) scaleX(1); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scaleX(0); }
+}
+
+/* ── Modal open: warp-in animation ── */
+#movieModal .modal-content {
+  animation: none;
+}
+#movieModal.show .modal-content {
+  animation: modal-warp-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+@keyframes modal-warp-in {
+  0%   { transform: scale(0.6) rotate(-4deg); opacity: 0; filter: blur(8px); }
+  60%  { filter: blur(0px); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+/* ── Navbar: warp speed on scroll ── */
+.navbar.warp-speed {
+  box-shadow: 0 2px 30px rgba(155,89,182,0.35), 0 0 60px rgba(212,160,23,0.1) !important;
+  border-bottom-color: rgba(212,160,23,0.3) !important;
+}
+
+/* ── Parallax hero text float ── */
+.hero-content { will-change: transform; }
+
+/* ── About stats row ── */
+.stats-row {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  flex-wrap: wrap;
+  margin: 50px 0 0;
+  padding: 36px;
+  background: var(--bg-card);
+  border: 1px solid rgba(155,89,182,0.15);
+  border-radius: 20px;
+}
+.stat-item { text-align: center; }
+.stat-label {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+
+/* ── Glitch title on hover ── */
+.navbar-brand:hover .glitch {
+  animation: glitch 0.4s steps(2) forwards;
+}
+@keyframes glitch {
+  0%   { text-shadow: 2px 0 #9b59b6, -2px 0 #d4a017; }
+  25%  { text-shadow: -3px 1px #d4a017, 3px -1px #9b59b6; }
+  50%  { text-shadow: 3px -1px #9b59b6, -3px 1px #d4a017; }
+  75%  { text-shadow: -2px 2px #d4a017, 2px -2px #9b59b6; }
+  100% { text-shadow: none; }
+}
+
+/* ── Floating nebula blobs in bg ── */
+.nebula-blob {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0;
+  animation: nebula-drift 20s ease-in-out infinite;
+}
+.nebula-blob.nb1 {
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(108,52,131,0.25), transparent 70%);
+  top: 20%; left: -10%;
+  animation-duration: 18s;
+}
+.nebula-blob.nb2 {
+  width: 500px; height: 300px;
+  background: radial-gradient(circle, rgba(212,160,23,0.12), transparent 70%);
+  top: 60%; right: -8%;
+  animation-duration: 24s;
+  animation-delay: -8s;
+}
+.nebula-blob.nb3 {
+  width: 350px; height: 350px;
+  background: radial-gradient(circle, rgba(155,89,182,0.15), transparent 70%);
+  bottom: 10%; left: 30%;
+  animation-duration: 22s;
+  animation-delay: -14s;
+}
+@keyframes nebula-drift {
+  0%,100% { opacity: 0.6; transform: translate(0, 0) scale(1); }
+  33%      { opacity: 1;   transform: translate(30px, -20px) scale(1.08); }
+  66%      { opacity: 0.7; transform: translate(-20px, 15px) scale(0.95); }
+}

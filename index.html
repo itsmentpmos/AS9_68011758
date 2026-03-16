@@ -16,6 +16,18 @@
 </head>
 <body>
 
+<!-- Space canvas (starfield + wormhole particles) -->
+<canvas id="spaceCanvas"></canvas>
+
+<!-- Nebula background blobs -->
+<div class="nebula-blob nb1"></div>
+<div class="nebula-blob nb2"></div>
+<div class="nebula-blob nb3"></div>
+
+<!-- Custom cursor -->
+<div class="cursor-glow" id="cursorGlow"></div>
+<div class="cursor-trail" id="cursorTrail"></div>
+
 <!-- ===================== NAVBAR ===================== -->
 <nav class="navbar navbar-expand-lg">
   <div class="container">
@@ -131,14 +143,14 @@
 <!-- ===================== MOVIES ===================== -->
 <section id="movies">
   <div class="container">
-    <div class="section-header">
+    <div class="section-header reveal">
       <div class="section-label">
         <i class="bi bi-film me-2"></i>ภาพยนตร์ยอดนิยม
       </div>
       <h2 class="section-title">หนังแนะนำประจำเดือน</h2>
       <div class="section-divider"></div>
     </div>
-    <div class="row" id="movieGrid">
+    <div class="row reveal-stagger" id="movieGrid">
       <!-- Rendered by JS -->
     </div>
   </div>
@@ -147,7 +159,7 @@
 <!-- ===================== ABOUT ===================== -->
 <section id="about">
   <div class="container">
-    <div class="section-header">
+    <div class="section-header reveal">
       <div class="section-label">
         <i class="bi bi-people me-2"></i>เกี่ยวกับเรา
       </div>
@@ -156,14 +168,14 @@
     </div>
 
     <div class="row mb-5">
-      <div class="col-lg-7 mx-auto text-center">
+      <div class="col-lg-7 mx-auto text-center reveal">
         <p class="about-text">
           <strong style="color:#fff">Singularity</strong> คือแพลตฟอร์มภาพยนตร์ออนไลน์ที่รวบรวมภาพยนตร์คุณภาพจากทั่วทุกมุมโลก ไม่ว่าจะเป็นหนังไทย ฮอลลีวูด อนิเมะ หรืออาร์ตเฮาส์ เราคัดสรรเฉพาะเนื้อหาที่ดีที่สุดมาไว้ในที่เดียว ด้วยระบบแนะนำที่ฉลาด คุณจะไม่มีวันหมดไอเดียในการเลือกหนังดู
         </p>
       </div>
     </div>
 
-    <div class="row g-4">
+    <div class="row g-4 reveal-stagger">
       <div class="col-md-4">
         <div class="about-card">
           <div class="about-icon">
@@ -192,6 +204,27 @@
         </div>
       </div>
     </div>
+
+    <!-- Stats row -->
+    <div class="stats-row reveal">
+      <div class="stat-item">
+        <span class="stat-number" data-target="10000">0</span>
+        <div class="stat-label">ภาพยนตร์</div>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" data-target="4">0</span>
+        <div class="stat-label">K Resolution</div>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" data-target="99">0</span>
+        <div class="stat-label">% Uptime</div>
+      </div>
+      <div class="stat-item">
+        <span class="stat-number" data-target="50">0</span>
+        <div class="stat-label">ประเทศ</div>
+      </div>
+    </div>
+
   </div>
 </section>
 
@@ -206,7 +239,7 @@
       <div class="section-divider"></div>
     </div>
 
-    <div class="text-center mt-4">
+    <div class="text-center mt-4 reveal">
       <p style="color:var(--text-secondary); font-size:1rem; margin-bottom:30px;">
         ทีมงาน Singularity พร้อมรับฟังและตอบกลับทุกข้อสงสัยของคุณ<br>
         คลิกปุ่มด้านล่างเพื่อส่งข้อความหาเรา
@@ -239,7 +272,7 @@
     <hr class="footer-divider"/>
 
     <p class="footer-copy">
-      © 2025 Movie By <span>68011758</span> &nbsp;|&nbsp;
+      © 2026 Movie By <span>68011758</span> &nbsp;|&nbsp;
       Powered by <span>Singularity</span>
     </p>
   </div>

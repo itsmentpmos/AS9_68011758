@@ -243,3 +243,259 @@ document.addEventListener('DOMContentLoaded', () => {
   initSmoothScroll();
   initActiveNav();
 });
+
+// ============================================
+//  SINGULARITY — SPACE ANIMATION ENGINE
+// ============================================
+
+// ── 1. Canvas Starfield + Wormhole ──────────
+function initSpaceCanvas() {
+  const canvas = document.getElementById('spaceCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, stars = [], wormholeActive = false, wormholeX = 0, wormholeY = 0, wormholeT = 0;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  // Generate stars
+  function mkStars(n) {
+    stars = [];
+    for (let i = 0; i < n; i++) {
+      stars.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 1.4 + 0.2,
+        alpha: Math.random() * 0.7 + 0.3,
+        twinkleSpeed: Math.random() * 0.02 + 0.005,
+        twinkleDir: Math.random() > 0.5 ? 1 : -1,
+        vx: (Math.random() - 0.5) * 0.08,
+        vy: (Math.random() - 0.5) * 0.08,
+        color: Math.random() > 0.85
+          ? `rgba(212,160,23,`
+          : Math.random() > 0.7
+          ? `rgba(155,89,182,`
+          : `rgba(255,255,255,`
+      });
+    }
+  }
+  mkStars(280);
+
+  let frame = 0;
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    frame++;
+
+    // Draw stars
+    stars.forEach(s => {
+      s.alpha += s.twinkleSpeed * s.twinkleDir;
+      if (s.alpha >= 1)   { s.alpha = 1;   s.twinkleDir = -1; }
+      if (s.alpha <= 0.1) { s.alpha = 0.1; s.twinkleDir = 1;  }
+      s.x += s.vx;
+      s.y += s.vy;
+      if (s.x < 0) s.x = W; if (s.x > W) s.x = 0;
+      if (s.y < 0) s.y = H; if (s.y > H) s.y = 0;
+
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = s.color + s.alpha + ')';
+      ctx.fill();
+    });
+
+    // Wormhole ripple (triggered on card click)
+    if (wormholeActive) {
+      wormholeT += 0.06;
+      for (let i = 0; i < 5; i++) {
+        const radius = (wormholeT * 180 + i * 60) % 600;
+        const alpha  = Math.max(0, 0.6 - radius / 500);
+        ctx.beginPath();
+        ctx.arc(wormholeX, wormholeY, radius, 0, Math.PI * 2);
+        ctx.strokeStyle = i % 2 === 0
+          ? `rgba(212,160,23,${alpha})`
+          : `rgba(155,89,182,${alpha})`;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+      if (wormholeT > 8) { wormholeActive = false; wormholeT = 0; }
+    }
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+
+  // Expose trigger
+  window.triggerWormhole = function(x, y) {
+    wormholeX = x; wormholeY = y;
+    wormholeActive = true; wormholeT = 0;
+  };
+}
+
+// ── 2. Custom Cursor Glow ───────────────────
+function initCursor() {
+  const glow  = document.getElementById('cursorGlow');
+  const trail = document.getElementById('cursorTrail');
+  if (!glow || !trail) return;
+
+  let mx = 0, my = 0, tx = 0, ty = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    glow.style.left = mx + 'px';
+    glow.style.top  = my + 'px';
+  });
+
+  // Smooth trail lag
+  function moveTrail() {
+    tx += (mx - tx) * 0.14;
+    ty += (my - ty) * 0.14;
+    trail.style.left = tx + 'px';
+    trail.style.top  = ty + 'px';
+    requestAnimationFrame(moveTrail);
+  }
+  moveTrail();
+
+  // Grow cursor on hover over interactive elements
+  document.querySelectorAll('a, button, .movie-card, .about-card').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      glow.style.width  = '50px';
+      glow.style.height = '50px';
+      glow.style.opacity = '0.9';
+    });
+    el.addEventListener('mouseleave', () => {
+      glow.style.width  = '20px';
+      glow.style.height = '20px';
+      glow.style.opacity = '0.7';
+    });
+  });
+}
+
+// ── 3. Scroll Reveal (IntersectionObserver) ─
+function initScrollReveal() {
+  const items = document.querySelectorAll('.reveal, .reveal-stagger');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        // Trigger number counter when stats row appears
+        if (entry.target.classList.contains('stats-row') ||
+            entry.target.querySelector('.stat-number')) {
+          animateCounters(entry.target);
+        }
+        obs.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  items.forEach(el => obs.observe(el));
+}
+
+// ── 4. Number Counter Animation ─────────────
+function animateCounters(container) {
+  const nums = container.querySelectorAll('.stat-number[data-target]');
+  nums.forEach(el => {
+    const target = +el.dataset.target;
+    const dur    = 1800;
+    const start  = performance.now();
+    function tick(now) {
+      const pct = Math.min((now - start) / dur, 1);
+      const ease = 1 - Math.pow(1 - pct, 3);
+      el.textContent = Math.round(target * ease).toLocaleString();
+      if (pct < 1) requestAnimationFrame(tick);
+      else {
+        el.textContent = target.toLocaleString();
+        if (target === 99) el.textContent = '99%';
+        if (target === 4)  el.textContent = '4K';
+      }
+    }
+    requestAnimationFrame(tick);
+  });
+}
+
+// ── 5. Warp Ripple on Card Click ────────────
+function initCardClickEffects() {
+  document.addEventListener('click', e => {
+    const card = e.target.closest('.movie-card');
+    if (!card) return;
+
+    // Canvas wormhole
+    if (window.triggerWormhole) {
+      window.triggerWormhole(e.clientX, e.clientY);
+    }
+
+    // DOM ripple overlay
+    const ripple = document.createElement('div');
+    ripple.className = 'warp-ripple';
+    ripple.style.left   = e.clientX + 'px';
+    ripple.style.top    = e.clientY + 'px';
+    ripple.style.width  = '80px';
+    ripple.style.height = '80px';
+    document.body.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 900);
+  });
+}
+
+// ── 6. Shooting Stars (random intervals) ────
+function initShootingStars() {
+  function shoot() {
+    const star = document.createElement('div');
+    star.className = 'shooting-star';
+    const startX = Math.random() * window.innerWidth;
+    const startY = Math.random() * (window.innerHeight * 0.6);
+    const angle  = 25 + Math.random() * 30; // degrees
+    const dist   = 300 + Math.random() * 400;
+    const dur    = 600 + Math.random() * 600;
+    const rad    = angle * Math.PI / 180;
+    star.style.left = startX + 'px';
+    star.style.top  = startY + 'px';
+    star.style.setProperty('--dx', (Math.cos(rad) * dist) + 'px');
+    star.style.setProperty('--dy', (Math.sin(rad) * dist) + 'px');
+    star.style.animationDuration = dur + 'ms';
+    document.body.appendChild(star);
+    setTimeout(() => star.remove(), dur + 100);
+
+    // Schedule next
+    setTimeout(shoot, 2000 + Math.random() * 5000);
+  }
+  setTimeout(shoot, 1500);
+}
+
+// ── 7. Hero Parallax on scroll ──────────────
+function initHeroParallax() {
+  const hero    = document.querySelector('.hero-banner');
+  const content = document.querySelector('.hero-content');
+  const bh      = document.querySelector('.hero-blackhole');
+  if (!hero || !content) return;
+
+  window.addEventListener('scroll', () => {
+    const sy = window.scrollY;
+    if (sy > window.innerHeight) return;
+    const pct = sy / window.innerHeight;
+    content.style.transform = `translateY(${sy * 0.3}px)`;
+    content.style.opacity   = 1 - pct * 1.4;
+    if (bh) bh.style.transform = `translateY(${sy * 0.15}px) scale(${1 + pct * 0.1})`;
+  }, { passive: true });
+}
+
+// ── 8. Navbar glow on scroll ─────────────────
+function initNavbarGlow() {
+  const nav = document.querySelector('.navbar');
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 80) nav.classList.add('warp-speed');
+    else nav.classList.remove('warp-speed');
+  }, { passive: true });
+}
+
+// ── INIT ALL ANIMATIONS ──────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  initSpaceCanvas();
+  initCursor();
+  initScrollReveal();
+  initCardClickEffects();
+  initShootingStars();
+  initHeroParallax();
+  initNavbarGlow();
+});
